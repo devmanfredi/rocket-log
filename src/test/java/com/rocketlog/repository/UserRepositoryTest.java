@@ -30,4 +30,11 @@ public class UserRepositoryTest {
         Assert.assertThat(result.getEmail(), Matchers.equalTo(user.getEmail()));
 
     }
+
+    @Test
+    public void dadoUsuario_quandoSalvar_entaoDeveRetornarId() {
+        User user = UserBuilder.admin().build();
+        User result = repository.save(user);
+        Assert.assertNotNull(result.getId());
+    }
 }
