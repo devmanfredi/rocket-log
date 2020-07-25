@@ -37,4 +37,9 @@ public class UserRepositoryTest {
         User result = repository.save(user);
         Assert.assertNotNull(result.getId());
     }
+
+    @Test
+    public void dadoUsuario_quandoEmailNulo_entaoNaoDeveSalvar() {
+
+    }
 }
