@@ -1,11 +1,14 @@
 package com.rocketlog.service;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.rocketlog.model.entity.User;
+import com.rocketlog.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
-public class UserService extends AbstractService {
-    public UserService(JpaRepository repository) {
+public class UserService extends AbstractService<UserRepository, User, UUID> {
+    public UserService(UserRepository repository) {
         super(repository);
     }
 }
