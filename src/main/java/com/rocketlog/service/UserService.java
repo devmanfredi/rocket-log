@@ -5,6 +5,7 @@ import com.rocketlog.exception.ResourceExistsException;
 import com.rocketlog.mapper.UserMapper;
 import com.rocketlog.model.entity.User;
 import com.rocketlog.repository.UserRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,28 @@ public class UserService extends AbstractService<UserRepository, User, UUID> {
         user = repository.saveAndFlush(user);
         customerService.save(user);
         return user;
+    }
+
+    public User update(UUID id, UserRequestDTO userRequestDTO) {
+        User user = repository.findById(id).orElse(null);
+        User userAuth = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!user.getId().equals(userAuth.getId())) {
+            throw new IllegalArgumentException("Authenticated user is not the same as informed user");
+        }
+
+        if (!user.getEmail().equals(userRequestDTO.getEmail())) {
+            validEmailExists(userRequestDTO.getEmail());
+        }
+
+        updateUser(user, userRequestDTO);
+
+        return repository.save(user);
+    }
+
+    private void updateUser(User user, UserRequestDTO userRequestDTO) {
+        user.setFullName(userRequestDTO.getFullName());
+        user.setEmail(userRequestDTO.getEmail());
+        user.setPassword(bCrypt.encode(userRequestDTO.getPassword()));
     }
 
     private void validEmailExists(String email) {
