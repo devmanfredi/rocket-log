@@ -14,7 +14,6 @@ public class UserBuilder {
         UserBuilder builder = new UserBuilder();
         builder.bCrypt = new BCryptPasswordEncoder();
         builder.user = User.builder()
-                .id(UUID.randomUUID())
                 .email("admin@admin.com")
                 .fullName("Admin")
                 .password(builder.bCrypt.encode(("admin")))
