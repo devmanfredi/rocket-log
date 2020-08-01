@@ -10,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -31,6 +32,10 @@ public class UserService extends AbstractService<UserRepository, User, UUID> {
         user = repository.saveAndFlush(user);
         customerService.save(user);
         return user;
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return repository.findByEmail(email);
     }
 
     public User update(UUID id, UserRequestDTO userRequestDTO) {
