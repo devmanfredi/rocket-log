@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rocketlog.builders.UserResquestBuilder;
 import com.rocketlog.dto.request.UserRequestDTO;
 import com.rocketlog.service.UserService;
+import com.rocketlog.util.GenerateToken;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,14 +18,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import javax.transaction.Transactional;
 
 import static com.rocketlog.util.TestUtil.convertObjectToJsonBytes;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -56,7 +54,7 @@ public class OauthControllerTest {
 
     @Before
     public void beforeTests() throws Exception {
-        token = generateToken();
+        token = GenerateToken.generateToken(mvc, parser, client, secret);
     }
 
     @Test
@@ -69,29 +67,6 @@ public class OauthControllerTest {
                 .andExpect(status().isCreated());
         perform.andExpect(jsonPath("$.email", is(user.getEmail())));
         perform.andExpect(jsonPath("$.fullName", is(user.getFullName())));
-
-    }
-
-    private String generateToken() throws Exception {
-
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("grant_type", "password");
-        params.add("username", "admin@admin.com");
-        params.add("password", "admin");
-
-        ResultActions login = mvc.perform(
-                post("/oauth/token")
-                        .params(params)
-                        .accept("application/json;charset=UTF-8")
-                        .with(httpBasic(client, secret)))
-                .andExpect(status().isOk());
-
-        String token = parser.parseMap(login
-                .andReturn()
-                .getResponse()
-                .getContentAsString()).get("access_token").toString();
-
-        return String.format("Bearer %s", token);
 
     }
 
