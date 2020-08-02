@@ -1,10 +1,11 @@
 package com.rocketlog.service;
 
 import com.rocketlog.dto.request.UserRequestDTO;
-import com.rocketlog.exception.ResourceExistsException;
+import com.rocketlog.exception.MessageException;
 import com.rocketlog.mapper.UserMapper;
 import com.rocketlog.model.entity.User;
 import com.rocketlog.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,13 +20,18 @@ public class UserService extends AbstractService<UserRepository, User, UUID> {
         super(repository);
     }
 
+    @Autowired
     private CustomerService customerService;
+
+    @Autowired
     private UserMapper mapper;
+
+    @Autowired
     private BCryptPasswordEncoder bCrypt;
 
 
     @Transactional
-    public User save(UserRequestDTO userRequestDTO) {
+    public User save(UserRequestDTO userRequestDTO) throws MessageException {
         validEmailExists(userRequestDTO.getEmail());
         User user = mapper.map(userRequestDTO);
         user.setPassword(bCrypt.encode(userRequestDTO.getPassword()));
@@ -38,7 +44,7 @@ public class UserService extends AbstractService<UserRepository, User, UUID> {
         return repository.findByEmail(email);
     }
 
-    public User update(UUID id, UserRequestDTO userRequestDTO) {
+    public User update(UUID id, UserRequestDTO userRequestDTO) throws MessageException {
         User user = repository.findById(id).orElse(null);
         User userAuth = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!user.getId().equals(userAuth.getId())) {
@@ -60,8 +66,8 @@ public class UserService extends AbstractService<UserRepository, User, UUID> {
         user.setPassword(bCrypt.encode(userRequestDTO.getPassword()));
     }
 
-    private void validEmailExists(String email) {
-        if (isEmailExists(email)) throw new ResourceExistsException("Email já cadastrado");
+    private void validEmailExists(String email) throws MessageException {
+        if (isEmailExists(email)) throw new MessageException("Email já cadastrado");
     }
 
     private Boolean isEmailExists(String email) {
