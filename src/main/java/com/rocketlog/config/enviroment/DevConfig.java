@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Profile;
 import java.text.ParseException;
 
 @Configuration
-@Profile("test")
-public class TestConfig {
+@Profile("dev")
+public class DevConfig {
 
     @Autowired
     DBService dbService;
@@ -25,7 +25,7 @@ public class TestConfig {
 
         if (!"create".equals(strategy)) return false;
 
-        dbService.instantiateTestDatabase();
+        dbService.instantiateDevDatabase();
 
         return true;
     }
