@@ -23,6 +23,7 @@ import javax.transaction.Transactional;
 
 import static com.rocketlog.util.TestUtil.convertObjectToJsonBytes;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -68,6 +69,28 @@ public class OauthControllerTest {
         perform.andExpect(jsonPath("$.email", is(user.getEmail())));
         perform.andExpect(jsonPath("$.fullName", is(user.getFullName())));
 
+    }
+
+    @Test
+    @Transactional
+    public void dadoUsuarioComEmailExistente_quandoRegistrar_entaoDeveRetornarErro() throws Exception {
+
+        UserRequestDTO user = UserResquestBuilder.usuarioAdmin().build();
+
+        ResultActions perform = mvc.perform(post(URI + "/signup")
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .content(convertObjectToJsonBytes(user)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Transactional
+    public void dadoUsuarioLogado_quandoPesquisarDadosDeUsuarioLogado_entaoDeveRetornarUsuario() throws Exception {
+        ResultActions perform = mvc.perform(get(URI + "/self")
+                .header("Authorization", token)
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(status().isOk());
+        perform.andExpect(jsonPath("$.email", is("admin@admin.com")));
     }
 
 }
