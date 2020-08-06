@@ -15,6 +15,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertThat;
@@ -56,6 +58,25 @@ public class UsuarioServiceTest {
         Mockito.when(userRepository.findByEmail("admin@admin.com")).thenReturn(Optional.of(user));
         User result = userService.findByEmail("error@admin.com").orElse(null);
         assertThat(result, Matchers.nullValue());
+    }
+
+    @Test
+    public void dadoUsuariosExistentes_quandoBuscarTodosUsuarios_entaoDeveRetornarTodosUsuarios() {
+        List<User> userList = new ArrayList<>();
+        userList.add(UserBuilder.admin().build());
+        userList.add(UserBuilder.comum().build());
+        userList.add(UserBuilder.rocketlog().build());
+
+        Mockito.when(userRepository.findAll()).thenReturn(userList);
+
+        List<User> result = userService.findAll();
+
+        //Assets
+        assertThat(result.stream().count(), Matchers.equalTo(3L));
+        assertThat(result.stream().filter(i -> i.getEmail().equals("rocketlog@rocketlog.com")).count(), Matchers.equalTo(1L));
+        assertThat(result.stream().filter(i -> i.getEmail().equals("erro@gmail.com")).count(), Matchers.equalTo(0L));
+        assertThat(result.stream().filter(i -> i.getEmail().equals("comum@comum.com")).count(), Matchers.equalTo(1L));
+
     }
 
 }
