@@ -50,4 +50,12 @@ public class UsuarioServiceTest {
         assertThat(result.getEmail(), Matchers.equalTo("admin@admin.com"));
     }
 
+    @Test
+    public void dadoUsuarioNaoExistente_quandoPesquisarPorEmail_entaoNaoDeveEncontrarUsuario() {
+        User user = UserBuilder.admin().build();
+        Mockito.when(userRepository.findByEmail("admin@admin.com")).thenReturn(Optional.of(user));
+        User result = userService.findByEmail("error@admin.com").orElse(null);
+        assertThat(result, Matchers.nullValue());
+    }
+
 }
