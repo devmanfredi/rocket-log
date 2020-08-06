@@ -1,7 +1,11 @@
 package com.rocketlog.service;
 
 import com.rocketlog.builders.UserBuilder;
+import com.rocketlog.builders.UserResquestBuilder;
+import com.rocketlog.dto.request.UserRequestDTO;
+import com.rocketlog.exception.MessageException;
 import com.rocketlog.mapper.UserMapper;
+import com.rocketlog.model.entity.Customer;
 import com.rocketlog.model.entity.User;
 import com.rocketlog.repository.UserRepository;
 import org.hamcrest.Matchers;
@@ -38,6 +42,9 @@ public class UsuarioServiceTest {
 
     @MockBean
     private BCryptPasswordEncoder bCrypt;
+
+    @MockBean
+    private CustomerService customerService;
 
 
     @Test
@@ -77,6 +84,25 @@ public class UsuarioServiceTest {
         assertThat(result.stream().filter(i -> i.getEmail().equals("erro@gmail.com")).count(), Matchers.equalTo(0L));
         assertThat(result.stream().filter(i -> i.getEmail().equals("comum@comum.com")).count(), Matchers.equalTo(1L));
 
+    }
+
+    @Test
+    public void dadoUsuarioRequestDTO_quandoSalvar_entaoDeveRetornarUsuarioSalvo() throws MessageException {
+        UserRequestDTO userDTO = UserResquestBuilder.usuarioAdmin().build();
+        User user = mapper.map(userDTO);
+        String passwordCrypt = bCrypt.encode(userDTO.getPassword());
+        user.setPassword(passwordCrypt);
+
+        Customer customer = Customer.builder().user(user).build();
+
+        Mockito.when(bCrypt.encode(userDTO.getPassword())).thenReturn(passwordCrypt);
+        Mockito.when(userRepository.saveAndFlush(user)).thenReturn(user);
+        Mockito.when(customerService.save(user)).thenReturn(customer);
+
+        User result = userService.save(userDTO);
+
+        assertThat(result, Matchers.notNullValue());
+        assertThat(result.getId(), Matchers.equalTo(user.getId()));
     }
 
 }
