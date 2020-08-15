@@ -1,6 +1,7 @@
 package com.rocketlog.repository;
 
 import com.rocketlog.builders.UserBuilder;
+import com.rocketlog.exception.MessageException;
 import com.rocketlog.model.entity.User;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -15,6 +16,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertThat;
 
@@ -58,4 +60,15 @@ public class UserRepositoryTest {
         assertThat(result.stream().count(), Matchers.equalTo(3L));
     }
 
+    @Test
+    public void dadoUsuario_quandoPesquisarPorId_entaoDeveRetornarDados() throws MessageException {
+        User user = UserBuilder.admin().build();
+        Mockito.when(repository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        User result = repository.findById(user.getId()).orElseThrow(() -> new MessageException("Usuário não encontrado"));
+
+        assertThat(result, Matchers.notNullValue());
+        assertThat(result.getFullName(), Matchers.equalTo("Admin"));
+        assertThat(result.getEmail(), Matchers.equalTo("admin@admin.com"));
+    }
 }
