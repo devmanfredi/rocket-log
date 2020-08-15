@@ -6,11 +6,17 @@ import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertThat;
 
 @AutoConfigureMockMvc
 @RunWith(SpringRunner.class)
@@ -18,7 +24,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles("test")
 public class UserRepositoryTest {
 
-    @Autowired
+    @MockBean
     UserRepository repository;
 
     @Test
@@ -39,7 +45,17 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void dadoUsuario_quandoEmailNulo_entaoNaoDeveSalvar() {
+    public void deveRetornarListaDeUsuarios() {
+        List<User> userList = new ArrayList<>();
+        userList.add(UserBuilder.admin().build());
+        userList.add(UserBuilder.comum().build());
+        userList.add(UserBuilder.rocketlog().build());
 
+        Mockito.when(repository.findAll()).thenReturn(userList);
+
+        List<User> result = repository.findAll();
+        assertThat(result.stream().count(), Matchers.equalTo(3L));
+        assertThat(result.stream().count(), Matchers.equalTo(3L));
     }
+
 }
