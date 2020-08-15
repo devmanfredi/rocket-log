@@ -105,4 +105,16 @@ public class UsuarioServiceTest {
         assertThat(result.getId(), Matchers.equalTo(user.getId()));
     }
 
+    @Test
+    public void dadoUsuario_quandoPesquisarPorId_entaoDeveRetornarDados() throws MessageException {
+        User user = UserBuilder.admin().build();
+        Mockito.when(userService.findById(user.getId())).thenReturn(Optional.of(user));
+
+        User result = userService.findById(user.getId()).orElseThrow(() -> new MessageException("Usuário não encontrado"));
+
+        assertThat(result, Matchers.notNullValue());
+        assertThat(result.getFullName(), Matchers.equalTo("Admin"));
+        assertThat(result.getEmail(), Matchers.equalTo("admin@admin.com"));
+    }
+
 }
