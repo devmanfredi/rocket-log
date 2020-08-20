@@ -3,7 +3,6 @@ package com.rocketlog.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rocketlog.builders.UserResquestBuilder;
 import com.rocketlog.dto.request.UserRequestDTO;
-import com.rocketlog.service.UserService;
 import com.rocketlog.util.GenerateToken;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,9 +38,6 @@ public class OauthControllerTest {
 
     @Autowired
     private MockMvc mvc;
-
-    @Autowired
-    private UserService userService;
 
     @Value("${security.oauth2.client.client-id}")
     private String client;
