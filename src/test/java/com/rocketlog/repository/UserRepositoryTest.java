@@ -32,6 +32,8 @@ public class UserRepositoryTest {
     @Test
     public void dadoUsuario_quandoSalvar_entaoDeveRetornarEmail() {
         User user = UserBuilder.admin().build();
+        Mockito.when(repository.save(user)).thenReturn(user);
+
         User result = repository.save(user);
 
         Assert.assertNotNull(result.getEmail());
@@ -41,7 +43,9 @@ public class UserRepositoryTest {
 
     @Test
     public void dadoUsuario_quandoSalvar_entaoDeveRetornarId() {
-        User user = UserBuilder.admin().build();
+        User user = UserBuilder.adminComId("Heuler").build();
+        Mockito.when(repository.save(user)).thenReturn(user);
+
         User result = repository.save(user);
         Assert.assertNotNull(result.getId());
     }
