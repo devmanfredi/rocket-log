@@ -3,6 +3,8 @@ package com.rocketlog.builders;
 import com.rocketlog.model.entity.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.UUID;
+
 public class UserBuilder {
 
     private BCryptPasswordEncoder bCrypt;
@@ -37,6 +39,18 @@ public class UserBuilder {
                 .email("rocketlog@rocketlog.com")
                 .fullName("Rocketlog")
                 .password(builder.bCrypt.encode(("rocketlog")))
+                .build();
+        return builder;
+    }
+
+    public static UserBuilder adminComId(String fullName) {
+        UserBuilder builder = new UserBuilder();
+        builder.bCrypt = new BCryptPasswordEncoder();
+        builder.user = User.builder()
+                .id(UUID.randomUUID())
+                .email("admin@admin.com")
+                .fullName(fullName)
+                .password(builder.bCrypt.encode(("admin")))
                 .build();
         return builder;
     }
