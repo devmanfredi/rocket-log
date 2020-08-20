@@ -14,6 +14,7 @@ import javax.transaction.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
+
 @Service
 public class UserService extends AbstractService<UserRepository, User, UUID> {
     public UserService(UserRepository repository) {
@@ -73,4 +74,5 @@ public class UserService extends AbstractService<UserRepository, User, UUID> {
     private Boolean isEmailExists(String email) {
         return repository.findByEmail(email).isPresent();
     }
+
 }
