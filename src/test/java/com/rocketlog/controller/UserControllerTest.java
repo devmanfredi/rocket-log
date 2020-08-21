@@ -8,16 +8,24 @@ import com.rocketlog.util.GenerateToken;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+
+import javax.transaction.Transactional;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -54,6 +62,32 @@ public class UserControllerTest {
     @Before
     public void beforeTests() throws Exception {
         token = GenerateToken.generateToken(mvc, parser, client, secret);
+    }
+
+    @Test
+    @Transactional
+    public void deveRetornarListaDeUsuariosComPaginacao() throws Exception {
+        User joaozinho = UserBuilder.comum("Joao").build();
+        Thread.sleep(10000);
+        User mariazinha = UserBuilder.comum("Maria").build();
+        service.save(joaozinho);
+        service.save(mariazinha);
+        User user = UserBuilder.admin().build();
+
+        List<User> userList = Arrays.asList(joaozinho, mariazinha);
+        Page<User> page = new PageImpl<>(userList);
+
+        Mockito.when(securityService.getUserAuthenticated()).thenReturn(user);
+
+
+        ResultActions pageResponse = mvc.perform(get(URI + "/users")
+                .header("Authorization", token))
+                .andExpect(status().isOk());
+
+        String idJoaozinho = page.stream().filter(u -> u.getId().equals(joaozinho.getId())).map(u -> u.getId()).collect(Collectors.toList()).get(0).toString();
+        String idMariazinha = page.stream().filter(u -> u.getId().equals(mariazinha.getId())).map(u -> u.getId()).collect(Collectors.toList()).get(0).toString();
+        pageResponse.andExpect(jsonPath("$.content[0].id", is(idMariazinha)));
+        pageResponse.andExpect(jsonPath("$.content[1].id", is(idJoaozinho)));
     }
 
     @Test
