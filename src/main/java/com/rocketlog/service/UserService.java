@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,6 +37,7 @@ public class UserService extends AbstractService<UserRepository, User, UUID> {
         validEmailExists(userRequestDTO.getEmail());
         User user = mapper.map(userRequestDTO);
         user.setPassword(bCrypt.encode(userRequestDTO.getPassword()));
+        user.setCreatedDate(LocalDateTime.now());
         user = repository.saveAndFlush(user);
         customerService.save(user);
         return user;
@@ -65,6 +67,7 @@ public class UserService extends AbstractService<UserRepository, User, UUID> {
         user.setFullName(userRequestDTO.getFullName());
         user.setEmail(userRequestDTO.getEmail());
         user.setPassword(bCrypt.encode(userRequestDTO.getPassword()));
+        user.setLastModifiedDate(LocalDateTime.now());
     }
 
     private void validEmailExists(String email) throws MessageException {
