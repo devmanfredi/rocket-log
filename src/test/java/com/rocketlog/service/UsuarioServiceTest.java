@@ -71,7 +71,7 @@ public class UsuarioServiceTest {
     public void dadoUsuariosExistentes_quandoBuscarTodosUsuarios_entaoDeveRetornarTodosUsuarios() {
         List<User> userList = new ArrayList<>();
         userList.add(UserBuilder.admin().build());
-        userList.add(UserBuilder.comum().build());
+        userList.add(UserBuilder.comum("Comum").build());
         userList.add(UserBuilder.rocketlog().build());
 
         Mockito.when(userRepository.findAll()).thenReturn(userList);
