@@ -71,7 +71,7 @@ public class UsuarioServiceTest {
     public void dadoUsuariosExistentes_quandoBuscarTodosUsuarios_entaoDeveRetornarTodosUsuarios() {
         List<User> userList = new ArrayList<>();
         userList.add(UserBuilder.admin().build());
-        userList.add(UserBuilder.comum().build());
+        userList.add(UserBuilder.comum("Comum").build());
         userList.add(UserBuilder.rocketlog().build());
 
         Mockito.when(userRepository.findAll()).thenReturn(userList);
@@ -103,6 +103,18 @@ public class UsuarioServiceTest {
 
         assertThat(result, Matchers.notNullValue());
         assertThat(result.getId(), Matchers.equalTo(user.getId()));
+    }
+
+    @Test
+    public void dadoUsuario_quandoPesquisarPorId_entaoDeveRetornarDados() throws MessageException {
+        User user = UserBuilder.admin().build();
+        Mockito.when(userService.findById(user.getId())).thenReturn(Optional.of(user));
+
+        User result = userService.findById(user.getId()).orElseThrow(() -> new MessageException("Usuário não encontrado"));
+
+        assertThat(result, Matchers.notNullValue());
+        assertThat(result.getFullName(), Matchers.equalTo("Admin"));
+        assertThat(result.getEmail(), Matchers.equalTo("admin@admin.com"));
     }
 
 }
