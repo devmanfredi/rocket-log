@@ -54,7 +54,7 @@ public class UserRepositoryTest {
     public void deveRetornarListaDeUsuarios() {
         List<User> userList = new ArrayList<>();
         userList.add(UserBuilder.admin().build());
-        userList.add(UserBuilder.comum().build());
+        userList.add(UserBuilder.comum("Comum").build());
         userList.add(UserBuilder.rocketlog().build());
 
         Mockito.when(repository.findAll()).thenReturn(userList);
